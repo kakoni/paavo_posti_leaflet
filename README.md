@@ -4,3 +4,6 @@ This example app uses stat paavo-postalnumber data, http://www.stat.fi/tup/rajap
 Data has been converted into topojson form and can be found in data/posti.topo.json
 
 Oh do notice, it does take time to initialize.
+
+# Demo
+http://rawgit.com/kakoni/paavo_posti_leaflet/master/index.html
