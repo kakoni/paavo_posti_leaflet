@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  .boundary {
+    fill: none;
+    stroke: #777;
+    stroke-width: .70px;
+  }
+
+</style>
+<body>
+</body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+  var width = 960,
+      height = 800;
+
+  var projection = d3.geo.transverseMercator()
+      .rotate([-27,-65,0])
+      .translate([width/2, height/2])
+      .scale([4000])
+
+    var path = d3.geo.path()
+        .projection(projection)
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  d3.json("data/posti.topo_4326.json", function(error, postinrot) {
+    if (error) return console.error(error);
+    console.log(postinrot)
+
+    var posti_nrot = topojson.feature(postinrot, postinrot.objects['posti.geo_4326']);
+
+    svg.append("path")
+      .datum(posti_nrot)
+      .attr("class", "boundary")
+      .attr("d", path);
+  });
+
+</script>

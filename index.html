@@ -10,6 +10,13 @@
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 400px"></div>
+	<div>
+		<p>
+			Tarkkuus; <select id="precision">
+      	<option value="data/posti.topo.json">Tarkka</option>
+        <option value="data/posti.simplified.topo.json">Yksinkertaistettu</option>
+      </select>
+	</div>
 
 
 	<script src="js/leaflet.js"></script>
@@ -19,6 +26,8 @@
 	<script src="js/topojson.v1.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>
+
+		var layer = {};
 
 		L.TopoJSON = L.GeoJSON.extend({
 		  addData: function(jsonData) {
@@ -51,30 +60,29 @@
 			id: 'examples.map-20v6611k'
 		}).addTo(map);
 
-		function geojsonLoad(url, options, customLayer) {
-		    var layer = customLayer || L.geoJson();
-		    xhr(url, function(err, response) {
-		        if (err) return layer.fire('error', { error: err });
-		        //addData(layer, JSON.parse(response.responseText));
-		        layer.fire('ready');
-		    });
-		    return layer;
-		}
-
-
 		//proj4.defs("urn:ogc:def:crs:EPSG::3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=565.04,49.91,465.84,1.9848,-1.7439,9.0587,4.0772 +units=m +no_defs");
 		proj4.defs("urn:ogc:def:crs:EPSG::3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 
 		var topoLayer = new L.TopoJSON();
 
-		$.getJSON('data/posti.topo.json')
-		  .done(addTopoData);
+		function loadGeoJson(url) {
+			$.getJSON(url).done(addTopoData);
+		}
 
 		function addTopoData(topoData){
 		  topoLayer.addData(topoData);
 			console.log('done')
 		  topoLayer.addTo(map);
+
 		}
+
+		loadGeoJson('data/posti.topo.json');
+
+		$('#precision').change(function() {
+			var value = $( this ).val();
+			map.removeLayer(topoLayer);
+			loadGeoJson(value);
+		});
 
 	</script>
 </body>
