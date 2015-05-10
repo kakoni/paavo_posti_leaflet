@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Posti GeoJSON Example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="css/leaflet.css" />
+	<style>
+		.entity {
+			fill: none;
+			stroke: #777;
+			stroke-width: .70px;
+		}
+
+		div.tooltip {
+		  color: #222;
+		  background: #fff;
+		  padding: .5em;
+		  text-shadow: #f5f5f5 0 1px 0;
+		  border-radius: 2px;
+		  box-shadow: 0px 0px 2px 0px #a6a6a6;
+		  opacity: 0.9;
+		  position: absolute;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="map" style="width: 980px; height: 600px"></div>
+
+	<script src="js/leaflet.js"></script>
+	<script src='js/leaflet-omnivore.min.js'></script>
+	<script src="js/topojson.v1.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="js/tooltip.js"></script>
+
+	<script>
+
+		var map = L.map('map').setView([63, 25], 7);
+
+		L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'examples.map-20v6611k'
+		}).addTo(map);
+
+		// Add an SVG element to Leaflet’s overlay pane
+		var svg = d3.select(map.getPanes().overlayPane).append("svg");
+		var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+		var tooltip = d3.select("#map").append("div").attr("class", "tooltip");
+
+		d3.json("data/posti.topo_4326.json", function(collection) {
+
+			var bounds = d3.geo.bounds(topojson.feature(collection, collection.objects['posti.geo_4326']));
+		  var path = d3.geo.path().projection(projectPoint);
+
+			var feature = g.selectAll('.entity')
+					.data(topojson.feature(collection, collection.objects['posti.geo_4326']).features)
+					.enter()
+					.append('path')
+					.attr('class', 'entity')
+					.attr('pointer-events', 'all')
+					.call(d3.helper.tooltip(
+        		function(d, i) {
+          		return "<b>"+d.id + "</b><br/>"+d.properties.nimi;
+        	}
+        	));
+
+			// feature.on('mouseover', function(d, i) {
+			// 		console.log(d,i)
+			//
+			// });
+
+		  map.on("viewreset", reset);
+		  reset();
+
+		  // Reposition the SVG to cover the features.
+		  function reset() {
+				var bottomLeft = projectPoint(bounds[0]),
+						topRight = projectPoint(bounds[1]);
+
+				svg.attr('width', topRight[0] - bottomLeft[0])
+					 .attr('height', bottomLeft[1] - topRight[1])
+					 .style('margin-left', bottomLeft[0] + 'px')
+					 .style('margin-top', topRight[1] + 'px');
+
+				var translation = -bottomLeft[0] + ',' + -topRight[1];
+				g.attr('transform', 'translate(' + -bottomLeft[0] + ',' + -topRight[1] + ')');
+
+		    feature.attr("d", path);
+		  }
+
+			// Use Leaflet to implement a D3 geographic projection.
+			function projectPoint(x) {
+				var point = map.latLngToLayerPoint(new L.LatLng(x[1], x[0]));
+				return [point.x, point.y];
+			}
+		});
+
+	</script>
+</body>
+</html>

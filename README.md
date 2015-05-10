@@ -11,6 +11,8 @@ Oh do notice, it does take time to initialize.
 1. http://rawgit.com/kakoni/paavo_posti_leaflet/master/index.html Demonstrates leaflet + l.proj + topojson
 2. http://rawgit.com/kakoni/paavo_posti_leaflet/master/d3_test.html d3 + topojson
 3. http://rawgit.com/kakoni/paavo_posti_leaflet/master/index_4326.html leaflet + l.omnivore + topojson(4326 formatted)
+4. http://rawgit.com/kakoni/paavo_posti_leaflet/master/d3_leaflet.html leaflet + d3 + topojson
+
 
 
 # About data conversions
